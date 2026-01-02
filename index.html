@@ -180,10 +180,33 @@
         </section>
 
         <!-- Actions -->
-        <div class="action-bar">
-            <button id="generateBtn" class="btn btn-primary btn-lg">
+        <div class="action-bar" style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+            <button id="saveBtn" class="btn btn-secondary btn-lg"
+                style="flex: 1; background: #48bb78; color: white; border: none;">
+                Save Data
+            </button>
+            <button id="historyBtn" class="btn btn-secondary btn-lg"
+                style="flex: 1; background: #4299e1; color: white; border: none;">
+                History
+            </button>
+            <button id="generateBtn" class="btn btn-primary btn-lg" style="flex: 2;">
                 Generate Prescription PDF
             </button>
+        </div>
+
+        <!-- History Side Panel -->
+        <div id="historyPanel" class="glass-panel"
+            style="position: fixed; top: 0; right: -400px; width: 350px; height: 100vh; z-index: 1000; transition: right 0.3s ease; border-radius: 0; display: flex; flex-direction: column;">
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #e2e8f0;">
+                <h2 style="margin: 0;">Prescription History</h2>
+                <button id="closeHistoryBtn"
+                    style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+            </div>
+            <div id="historyList" style="flex: 1; overflow-y: auto;">
+                <!-- History Items will appear here -->
+                <p style="text-align: center; color: #718096; margin-top: 20px;">No saved prescriptions.</p>
+            </div>
         </div>
 
     </div>

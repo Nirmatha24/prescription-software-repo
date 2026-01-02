@@ -7,6 +7,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const medList = document.getElementById('medList');
     const generateBtn = document.getElementById('generateBtn');
 
+    // New Elements for Save/History
+    const saveBtn = document.getElementById('saveBtn');
+    const historyBtn = document.getElementById('historyBtn');
+    const historyPanel = document.getElementById('historyPanel');
+    const closeHistoryBtn = document.getElementById('closeHistoryBtn');
+    const historyList = document.getElementById('historyList');
+
     // Logo upload elements
     const logoInput = document.getElementById('logoInput');
     const logoUploadArea = document.getElementById('logoUploadArea');
@@ -32,6 +39,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // Event Listeners
     addMedBtn.addEventListener('click', addMedRow);
     generateBtn.addEventListener('click', generatePDF);
+
+    // Save/History Event Listeners
+    saveBtn.addEventListener('click', savePrescription);
+    historyBtn.addEventListener('click', () => {
+        renderHistory();
+        historyPanel.style.right = '0';
+    });
+    closeHistoryBtn.addEventListener('click', () => {
+        historyPanel.style.right = '-400px';
+    });
 
     // Logo Upload Logic
     logoUploadArea.addEventListener('click', () => {
@@ -279,6 +296,179 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Save
         doc.save(`${patName || 'Patient'}_Prescription.pdf`);
+    }
+
+    // --- Save & History Functions ---
+
+    function savePrescription() {
+        const patName = document.getElementById('patName').value || 'Unknown Patient';
+        const visitDate = document.getElementById('visitDate').value || new Date().toISOString().split('T')[0];
+
+        // Harvest Medicine Data
+        const medRows = [];
+        document.querySelectorAll('#medList tr').forEach(row => {
+            medRows.push({
+                type: row.querySelector('.med-type').value,
+                name: row.querySelector('.med-name').value,
+                strength: row.querySelector('.med-strength').value,
+                generic: row.querySelector('.med-generic').value,
+                dose: row.querySelector('.med-dose').value,
+                duration: row.querySelector('.med-duration').value,
+                freq: row.querySelector('.med-freq').value,
+                advice: row.querySelector('.med-advice').value
+            });
+        });
+
+        const data = {
+            id: Date.now(),
+            savedAt: new Date().toLocaleString(),
+            header: {
+                docName: document.getElementById('docName').value,
+                docQual: document.getElementById('docQual').value,
+                docHosp: document.getElementById('docHosp').value,
+                docReg: document.getElementById('docReg').value,
+                headerExtra: document.getElementById('headerExtra').value,
+                docMob: document.getElementById('docMob').value,
+                docEmail: document.getElementById('docEmail').value
+            },
+            patient: {
+                name: patName,
+                age: document.getElementById('patAge').value,
+                sex: document.getElementById('patSex').value,
+                date: visitDate,
+                diagnosis: document.getElementById('diagnosis').value
+            },
+            medicines: medRows,
+            generalAdvice: document.getElementById('generalAdvice').value
+        };
+
+        const saved = JSON.parse(localStorage.getItem('prescriptionHistory') || '[]');
+        saved.push(data);
+        localStorage.setItem('prescriptionHistory', JSON.stringify(saved));
+
+        alert('Prescription Saved Successfully!');
+    }
+
+    function renderHistory() {
+        const saved = JSON.parse(localStorage.getItem('prescriptionHistory') || '[]');
+        historyList.innerHTML = '';
+
+        if (saved.length === 0) {
+            historyList.innerHTML = '<p style="text-align: center; color: #718096; margin-top: 20px;">No saved prescriptions.</p>';
+            return;
+        }
+
+        // Sort by newest first
+        saved.reverse().forEach(item => {
+            const card = document.createElement('div');
+            card.style.cssText = 'background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; margin-bottom: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);';
+            card.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                    <div>
+                        <h4 style="margin: 0; color: #2d3748;">${item.patient.name}</h4>
+                        <small style="color: #718096;">${item.patient.date}</small>
+                    </div>
+                    <button class="delete-history-btn" data-id="${item.id}" style="color: #e53e3e; background: none; border: none; cursor: pointer;">&times;</button>
+                </div>
+                <div style="font-size: 0.85em; color: #4a5568; margin-bottom: 10px;">
+                    ${item.patient.diagnosis || 'No Diagnosis'}
+                </div>
+                <button class="load-btn btn-secondary" data-id="${item.id}" style="width: 100%; padding: 8px; font-size: 0.9em; background: #ebf8ff; color: #3182ce; border: none;">Load</button>
+            `;
+            historyList.appendChild(card);
+        });
+
+        // Attach listeners
+        document.querySelectorAll('.load-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => loadPrescription(e.target.dataset.id));
+        });
+        document.querySelectorAll('.delete-history-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => deletePrescription(e.target.dataset.id));
+        });
+    }
+
+    function loadPrescription(id) {
+        const saved = JSON.parse(localStorage.getItem('prescriptionHistory') || '[]');
+        const item = saved.find(i => i.id == id); // Loose equality for string/number match
+
+        if (!item) return;
+
+        // Restore Header
+        if (item.header) {
+            document.getElementById('docName').value = item.header.docName || '';
+            document.getElementById('docQual').value = item.header.docQual || '';
+            document.getElementById('docHosp').value = item.header.docHosp || '';
+            document.getElementById('docReg').value = item.header.docReg || '';
+            document.getElementById('headerExtra').value = item.header.headerExtra || '';
+            document.getElementById('docMob').value = item.header.docMob || '';
+            document.getElementById('docEmail').value = item.header.docEmail || '';
+        }
+
+        // Restore Patient
+        document.getElementById('patName').value = item.patient.name || '';
+        document.getElementById('patAge').value = item.patient.age || '';
+        document.getElementById('patSex').value = item.patient.sex || 'Male';
+        document.getElementById('visitDate').value = item.patient.date || '';
+        document.getElementById('diagnosis').value = item.patient.diagnosis || '';
+
+        // Restore Medicines
+        medList.innerHTML = ''; // Clear current list
+        if (item.medicines && item.medicines.length > 0) {
+            item.medicines.forEach(med => {
+                addMedRowWithValues(med);
+            });
+        } else {
+            addMedRow(); // Add empty if none
+        }
+
+        // Restore Device
+        document.getElementById('generalAdvice').value = item.generalAdvice || '';
+
+        // Close panel
+        historyPanel.style.right = '-400px';
+    }
+
+    function addMedRowWithValues(medData) {
+        // Reuse logic but populate values
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td style="display: flex; gap: 5px;">
+                <select class="med-type" style="width: 80px;">
+                    <option value="TAB" ${medData.type === 'TAB' ? 'selected' : ''}>TAB</option>
+                    <option value="CAP" ${medData.type === 'CAP' ? 'selected' : ''}>CAP</option>
+                    <option value="SYP" ${medData.type === 'SYP' ? 'selected' : ''}>SYP</option>
+                    <option value="OINT" ${medData.type === 'OINT' ? 'selected' : ''}>OINT</option>
+                    <option value="INJ" ${medData.type === 'INJ' ? 'selected' : ''}>INJ</option>
+                    <option value="DROP" ${medData.type === 'DROP' ? 'selected' : ''}>DROP</option>
+                </select>
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
+                    <div style="display: flex; gap: 5px;">
+                        <input type="text" placeholder="e.g. Amoxicillin" class="med-name" value="${medData.name}" style="flex: 1;">
+                        <input type="text" placeholder="500mg" class="med-strength" value="${medData.strength}" style="width: 80px; font-size: 0.9em;">
+                    </div>
+                    <input type="text" placeholder="(Composition)" class="med-generic" value="${medData.generic}" style="width: 100%; font-size: 0.85em; color: #666;">
+                </div>
+            </td>
+            <td><input type="text" list="dosageOptions" placeholder="1-0-1" class="med-dose" value="${medData.dose}"></td>
+            <td><input type="text" list="durOptions" placeholder="5 Days" class="med-duration" value="${medData.duration}"></td>
+            <td><input type="text" list="freqOptions" placeholder="Daily" class="med-freq" value="${medData.freq}"></td>
+            <td><input type="text" list="instrOptions" placeholder="After food" class="med-advice" value="${medData.advice}"></td>
+            <td class="action-col">
+                <button type="button" class="btn btn-icon delete-btn" onclick="this.closest('tr').remove()">
+                    &times;
+                </button>
+            </td>
+        `;
+        medList.appendChild(row);
+    }
+
+    function deletePrescription(id) {
+        if (!confirm('Are you sure you want to delete this saved prescription?')) return;
+
+        let saved = JSON.parse(localStorage.getItem('prescriptionHistory') || '[]');
+        saved = saved.filter(item => item.id != id);
+        localStorage.setItem('prescriptionHistory', JSON.stringify(saved));
+        renderHistory();
     }
 
 });
