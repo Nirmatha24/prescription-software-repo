@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prescription Generator</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- jsPDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+</head>
+
+<body>
+
+    <div class="main-container">
+
+        <div class="main-container">
+
+            <!-- Header / Doctor Info -->
+            <header class="header-section glass-panel">
+                <div class="header-grid">
+                    <!-- Left: Doc Info -->
+                    <div class="doctor-inputs">
+                        <div class="input-group">
+                            <label>Doctor Name</label>
+                            <input type="text" id="docName" placeholder="Dr. Anand P S">
+                        </div>
+                        <div class="input-group">
+                            <label>Qualifications</label>
+                            <input type="text" id="docQual" placeholder="MBBS, Medical Officer">
+                        </div>
+                        <div class="input-group full-width">
+                            <label>Designation/Hospital</label>
+                            <input type="text" id="docHosp" placeholder="FHC Angamoozhy">
+                        </div>
+                        <label>Reg No (TCMC)</label>
+                        <input type="text" id="docReg" placeholder="86987">
+                    </div>
+                    <div class="input-group full-width">
+                        <label>Additional Details</label>
+                        <textarea id="headerExtra"
+                            rows="3">Certificate in Diabetes Care (ADA - CE)&#10;GMC (UK):8035942</textarea>
+                    </div>
+                </div>
+
+                <!-- Center: Logo -->
+                <div class="logo-section">
+                    <input type="file" id="logoInput" accept="image/*" style="display: none;">
+                    <div class="logo-upload" id="logoUploadArea"
+                        style="cursor: pointer; position: relative; overflow: hidden;">
+                        <span id="defaultLogoIcon" style="font-size: 2rem;">⚕️</span>
+                        <small id="defaultLogoText">Click to Upload Logo</small>
+                        <img id="logoPreview" src="" alt="Logo"
+                            style="display: none; max-width: 100%; max-height: 100%; object-fit: contain;">
+                    </div>
+                </div>
+
+                <!-- Right: Contact -->
+                <div class="contact-inputs">
+                    <div class="input-group">
+                        <label>Mobile</label>
+                        <input type="text" id="docMob" placeholder="7558910321">
+                    </div>
+                    <div class="input-group">
+                        <label>Email</label>
+                        <input type="text" id="docEmail" placeholder="dranandps24@gmail.com">
+                    </div>
+                </div>
+        </div>
+        </header>
+
+        <!-- Patient Info -->
+        <section class="patient-section glass-panel">
+            <h2>Patient Details</h2>
+            <div class="patient-grid">
+                <div class="input-group">
+                    <label>Patient Name</label>
+                    <input type="text" id="patName" placeholder="Name">
+                </div>
+                <div class="input-group">
+                    <label>Age</label>
+                    <input type="number" id="patAge" placeholder="Age">
+                </div>
+                <div class="input-group">
+                    <label>Sex</label>
+                    <select id="patSex">
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Date</label>
+                    <input type="date" id="visitDate">
+                </div>
+            </div>
+            <!-- Diagnosis -->
+            <div class="input-group full-width" style="margin-top: 10px;">
+                <label>Diagnosis</label>
+                <input type="text" id="diagnosis" placeholder="e.g. Peripheral Neuropathy">
+            </div>
+        </section>
+
+        <!-- Datalists for Presets -->
+        <datalist id="dosageOptions">
+            <option value="1-0-1">
+            <option value="1-0-0">
+            <option value="0-1-0">
+            <option value="0-0-1">
+            <option value="1-1-1">
+            <option value="0-1-1">
+            <option value="1 SOS">
+        </datalist>
+
+        <datalist id="freqOptions">
+            <option value="Daily">
+            <option value="Alternate Days">
+            <option value="Once Weekly">
+            <option value="Twice Weekly">
+        </datalist>
+
+        <datalist id="durOptions">
+            <option value="2 Days">
+            <option value="3 Days">
+            <option value="5 Days">
+            <option value="7 Days">
+            <option value="15 Days">
+            <option value="1 Month">
+        </datalist>
+
+        <datalist id="instrOptions">
+            <option value="Before Food">
+            <option value="After Food">
+            <option value="With Food">
+        </datalist>
+
+        <!-- Medicine Section -->
+        <section class="medicine-section glass-panel">
+            <div class="section-header">
+                <h2><span style="font-size: 1.5em; vertical-align: middle;">Rx</span> Medications</h2>
+                <button type="button" id="addMedBtn" class="btn btn-secondary">
+                    <span class="icon">+</span> Add Medicine
+                </button>
+            </div>
+
+            <div class="table-container">
+                <table id="medTable">
+                    <thead>
+                        <tr>
+                            <th>Medicine Name</th>
+                            <th>Dosage</th>
+                            <th>Duration</th>
+                            <th>Frequency</th>
+                            <th>Special Advice</th>
+                            <th class="action-col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="medList">
+                        <!-- Rows will be added dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- General Advice Section -->
+        <section class="advice-section glass-panel">
+            <h2>General / Other Advice</h2>
+            <textarea id="generalAdvice" rows="4"
+                placeholder="Enter general advice (e.g., Drink plenty of water, Avoid oily food...)"
+                style="width: 100%;"></textarea>
+        </section>
+
+        <!-- Actions -->
+        <div class="action-bar">
+            <button id="generateBtn" class="btn btn-primary btn-lg">
+                Generate Prescription PDF
+            </button>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
