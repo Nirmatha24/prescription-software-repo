@@ -361,19 +361,20 @@ document.addEventListener('DOMContentLoaded', () => {
         // Sort by newest first
         saved.reverse().forEach(item => {
             const card = document.createElement('div');
-            card.style.cssText = 'background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; margin-bottom: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);';
+            card.className = 'history-card';
+
             card.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                <div class="history-card-header">
                     <div>
-                        <h4 style="margin: 0; color: #2d3748;">${item.patient.name}</h4>
-                        <small style="color: #718096;">${item.patient.date}</small>
+                        <h4>${item.patient.name}</h4>
+                        <small>${item.patient.date}</small>
                     </div>
-                    <button class="delete-history-btn" data-id="${item.id}" style="color: #e53e3e; background: none; border: none; cursor: pointer;">&times;</button>
+                    <button class="delete-history-btn" data-id="${item.id}">&times;</button>
                 </div>
-                <div style="font-size: 0.85em; color: #4a5568; margin-bottom: 10px;">
+                <div class="history-diagnosis">
                     ${item.patient.diagnosis || 'No Diagnosis'}
                 </div>
-                <button class="load-btn btn-secondary" data-id="${item.id}" style="width: 100%; padding: 8px; font-size: 0.9em; background: #ebf8ff; color: #3182ce; border: none;">Load</button>
+                <button class="load-btn" data-id="${item.id}">Load</button>
             `;
             historyList.appendChild(card);
         });
