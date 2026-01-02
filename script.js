@@ -73,6 +73,53 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // --- Medicine Auto-Complete Data ---
+    const commonMedicines = [
+        { name: "Paracetamol", type: "TAB", strength: "500mg", generic: "Paracetamol" },
+        { name: "Paracetamol", type: "TAB", strength: "650mg", generic: "Paracetamol" },
+        { name: "Amoxicillin", type: "CAP", strength: "500mg", generic: "Amoxicillin" },
+        { name: "Metformin", type: "TAB", strength: "500mg", generic: "Metformin" },
+        { name: "Metformin", type: "TAB", strength: "1000mg", generic: "Metformin" },
+        { name: "Atorvastatin", type: "TAB", strength: "10mg", generic: "Atorvastatin" },
+        { name: "Atorvastatin", type: "TAB", strength: "20mg", generic: "Atorvastatin" },
+        { name: "Pantoprazole", type: "TAB", strength: "40mg", generic: "Pantoprazole" },
+        { name: "Omeprazole", type: "CAP", strength: "20mg", generic: "Omeprazole" },
+        { name: "Azithromycin", type: "TAB", strength: "500mg", generic: "Azithromycin" },
+        { name: "Ciprofloxacin", type: "TAB", strength: "500mg", generic: "Ciprofloxacin" },
+        { name: "Cetirizine", type: "TAB", strength: "10mg", generic: "Cetirizine" },
+        { name: "Levocetirizine", type: "TAB", strength: "5mg", generic: "Levocetirizine" },
+        { name: "Montelukast", type: "TAB", strength: "10mg", generic: "Montelukast" },
+        { name: "Amlodipine", type: "TAB", strength: "5mg", generic: "Amlodipine" },
+        { name: "Telmisartan", type: "TAB", strength: "40mg", generic: "Telmisartan" },
+        { name: "Losartan", type: "TAB", strength: "50mg", generic: "Losartan" },
+        { name: "Aspirin", type: "TAB", strength: "75mg", generic: "Acetylsalicylic Acid" },
+        { name: "Clopidogrel", type: "TAB", strength: "75mg", generic: "Clopidogrel" },
+        { name: "Ranitidine", type: "TAB", strength: "150mg", generic: "Ranitidine" },
+        { name: "Diclofenac", type: "TAB", strength: "50mg", generic: "Diclofenac" },
+        { name: "Aceclofenac", type: "TAB", strength: "100mg", generic: "Aceclofenac" },
+        { name: "Ibuprofen", type: "TAB", strength: "400mg", generic: "Ibuprofen" },
+        { name: "Vildagliptin", type: "TAB", strength: "50mg", generic: "Vildagliptin" },
+        { name: "Glimepiride", type: "TAB", strength: "1mg", generic: "Glimepiride" },
+        { name: "Glimepiride", type: "TAB", strength: "2mg", generic: "Glimepiride" },
+        { name: "Thyroxine", type: "TAB", strength: "25mcg", generic: "Levothyroxine" },
+        { name: "Thyroxine", type: "TAB", strength: "50mcg", generic: "Levothyroxine" },
+        { name: "Thyroxine", type: "TAB", strength: "100mcg", generic: "Levothyroxine" },
+        { name: "Dolo", type: "TAB", strength: "650mg", generic: "Paracetamol" },
+        { name: "Augmentin", type: "TAB", strength: "625mg", generic: "Amoxicillin + Clavulanic Acid" }
+    ];
+
+    // Populate Datalist
+    const medSuggestions = document.getElementById('medSuggestions');
+    if (medSuggestions) {
+        // Use a Set to avoid duplicates if any
+        const uniqueNames = [...new Set(commonMedicines.map(m => m.name))];
+        uniqueNames.sort().forEach(name => {
+            const option = document.createElement('option');
+            option.value = name;
+            medSuggestions.appendChild(option);
+        });
+    }
+
     // Function to add a new medicine row
     function addMedRow() {
         const row = document.createElement('tr');
@@ -89,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </select>
                 <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
                     <div style="display: flex; gap: 5px;">
-                        <input type="text" placeholder="e.g. Amoxicillin" class="med-name" style="flex: 1;">
+                        <input type="text" placeholder="e.g. Amoxicillin" class="med-name" list="medSuggestions" style="flex: 1;">
                         <input type="text" placeholder="500mg" class="med-strength" style="width: 80px; font-size: 0.9em;">
                     </div>
                     <input type="text" placeholder="(Composition)" class="med-generic" style="width: 100%; font-size: 0.85em; color: #666;">
@@ -108,8 +155,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
         medList.appendChild(row);
 
+        const nameInput = row.querySelector('.med-name');
+
         // Focus on the name input
-        row.querySelector('.med-name').focus();
+        nameInput.focus();
+
+        // Attach Auto-Complete Logic
+        nameInput.addEventListener('input', (e) => handleMedInput(e.target, row));
+    }
+
+    // Auto-complete Handler
+    function handleMedInput(input, row) {
+        const val = input.value;
+        // Find exact match (case insensitive)
+        const match = commonMedicines.find(m => m.name.toLowerCase() === val.toLowerCase());
+
+        if (match) {
+            // Auto-fill details
+            const typeSelect = row.querySelector('.med-type');
+            const strengthInput = row.querySelector('.med-strength');
+            const genericInput = row.querySelector('.med-generic');
+
+            if (match.type) typeSelect.value = match.type;
+            if (match.strength) strengthInput.value = match.strength;
+            if (match.generic) genericInput.value = `(${match.generic})`;
+        }
     }
 
     // Function to generate PDF
@@ -444,7 +514,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </select>
                 <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
                     <div style="display: flex; gap: 5px;">
-                        <input type="text" placeholder="e.g. Amoxicillin" class="med-name" value="${medData.name}" style="flex: 1;">
+                        <input type="text" placeholder="e.g. Amoxicillin" class="med-name" list="medSuggestions" value="${medData.name}" style="flex: 1;">
                         <input type="text" placeholder="500mg" class="med-strength" value="${medData.strength}" style="width: 80px; font-size: 0.9em;">
                     </div>
                     <input type="text" placeholder="(Composition)" class="med-generic" value="${medData.generic}" style="width: 100%; font-size: 0.85em; color: #666;">
@@ -461,6 +531,9 @@ document.addEventListener('DOMContentLoaded', () => {
             </td>
         `;
         medList.appendChild(row);
+
+        // Attach Auto-Complete Logic
+        row.querySelector('.med-name').addEventListener('input', (e) => handleMedInput(e.target, row));
     }
 
     function deletePrescription(id) {
