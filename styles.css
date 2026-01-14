@@ -220,14 +220,19 @@ th:nth-child(4) {
     width: 15%;
 }
 
-/* Frequency - Moved */
+/* Special Advice - moved to 4th visual column */
 th:nth-child(5) {
+    width: 15%;
+}
+
+/* Frequency - moved to 5th visual column */
+th:nth-child(6) {
     width: 10%;
 }
 
-/* Special Advice */
+/* Action */
 th:last-child {
-    width: 10%;
+    width: 5%;
 }
 
 /* Action */

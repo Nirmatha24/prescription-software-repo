@@ -144,8 +144,8 @@ document.addEventListener('DOMContentLoaded', () => {
             </td>
             <td><input type="text" list="dosageOptions" placeholder="1-0-1" class="med-dose"></td>
             <td><input type="text" list="durOptions" placeholder="5 Days" class="med-duration"></td>
-            <td><input type="text" list="freqOptions" placeholder="Daily" class="med-freq"></td>
             <td><input type="text" list="instrOptions" placeholder="After food" class="med-advice"></td>
+            <td><input type="text" list="freqOptions" placeholder="Daily" class="med-freq"></td>
             <td class="action-col">
                 <button type="button" class="btn btn-icon delete-btn" onclick="this.closest('tr').remove()">
                     &times;
@@ -323,8 +323,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     dose,
                     "X", // Static Separator
                     dur,
-                    freq,
-                    advice
+                    advice,
+                    freq
                 ]);
             }
         });
@@ -346,8 +346,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     1: { cellWidth: 20 }, // Dose
                     2: { cellWidth: 10, halign: 'center' }, // X
                     3: { cellWidth: 25 }, // Duration
-                    4: { cellWidth: 25 }, // Frequency
-                    5: { cellWidth: 30 }  // Advice
+                    4: { cellWidth: 30 }, // Advice
+                    5: { cellWidth: 25 }  // Frequency
                 }
             });
         }
@@ -522,8 +522,8 @@ document.addEventListener('DOMContentLoaded', () => {
             </td>
             <td><input type="text" list="dosageOptions" placeholder="1-0-1" class="med-dose" value="${medData.dose}"></td>
             <td><input type="text" list="durOptions" placeholder="5 Days" class="med-duration" value="${medData.duration}"></td>
-            <td><input type="text" list="freqOptions" placeholder="Daily" class="med-freq" value="${medData.freq}"></td>
             <td><input type="text" list="instrOptions" placeholder="After food" class="med-advice" value="${medData.advice}"></td>
+            <td><input type="text" list="freqOptions" placeholder="Daily" class="med-freq" value="${medData.freq}"></td>
             <td class="action-col">
                 <button type="button" class="btn btn-icon delete-btn" onclick="this.closest('tr').remove()">
                     &times;
