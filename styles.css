@@ -201,33 +201,34 @@ th {
 
 /* Column Widths */
 th:first-child {
-    width: 35%;
-    min-width: 250px;
+    width: 45%;
+    min-width: 300px;
 }
 
 /* Medicine Name */
 th:nth-child(2) {
-    width: 15%;
+    width: 12%;
 }
 
 /* Dosage */
 th:nth-child(3) {
-    width: 15%;
+    width: 12%;
 }
 
-/* Duration - Moved */
+/* Duration */
 th:nth-child(4) {
-    width: 15%;
+    width: 12%;
 }
 
-/* Special Advice - moved to 4th visual column */
+/* Frequency */
 th:nth-child(5) {
-    width: 15%;
+    width: 14%;
 }
 
-/* Frequency - moved to 5th visual column */
+/* Special Advice */
 th:nth-child(6) {
-    width: 10%;
+    width: 5%;
+    /* Placeholder as it might be Action? No check Action rule */
 }
 
 /* Action */
