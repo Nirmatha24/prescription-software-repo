@@ -270,7 +270,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const patY = lineY + 10;
         doc.text(`Patient Name: ${patName}`, 15, patY);
         doc.text(`Age/Sex: ${patAge} / ${patSex}`, 90, patY); // Middle-ish
-        doc.text(`Date: ${date}`, 160, patY);
+
+        // Format Date to dd/mm/yy
+        let formattedDate = date;
+        if (date) {
+            const [y, m, d] = date.split('-');
+            if (y && m && d) {
+                formattedDate = `${d}/${m}/${y.slice(2)}`;
+            }
+        }
+
+        doc.text(`Date: ${formattedDate}`, 160, patY);
 
         if (diagnosis) {
             doc.setFont("times", "normal"); // Regular font
@@ -433,11 +443,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const card = document.createElement('div');
             card.className = 'history-card';
 
+            // Format Date for History Display
+            let displayDate = item.patient.date;
+            if (displayDate) {
+                const [y, m, d] = displayDate.split('-');
+                if (y && m && d) {
+                    displayDate = `${d}/${m}/${y.slice(2)}`;
+                }
+            }
+
             card.innerHTML = `
                 <div class="history-card-header">
                     <div>
                         <h4>${item.patient.name}</h4>
-                        <small>${item.patient.date}</small>
+                        <small>${displayDate}</small>
                     </div>
                     <button class="delete-history-btn" data-id="${item.id}">&times;</button>
                 </div>
